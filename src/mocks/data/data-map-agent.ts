@@ -8,20 +8,27 @@ import type { SessionItem, FavoriteItem } from '@/pages/data-map-agent/constant'
 const now = Date.now();
 const day = 24 * 3600 * 1000;
 
+/** 生成 Java LocalDateTime 风格的时间戳（到微秒，无时区），对齐真实后端。 */
+const toBackendIso = (ms: number) => {
+  const micros = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+  return new Date(ms).toISOString().replace(/Z$/, '').slice(0, -1) + micros;
+};
+
 const baseSession = (
   id: string,
-  title: string,
+  title: string | null,
   offsetDays: number,
 ): SessionItem => ({
   id,
   title,
+  taskScriptKind: null,
   agentType: 'DATA_MAP',
   status: 'ACTIVE',
-  summary: '',
-  taskCode: '',
-  projectId: 'demo',
-  createdAt: new Date(now - offsetDays * day).toISOString(),
-  lastActiveAt: new Date(now - offsetDays * day + 3600 * 1000).toISOString(),
+  summary: null,
+  taskCode: null,
+  projectId: 1,
+  createdAt: toBackendIso(now - offsetDays * day),
+  lastActiveAt: toBackendIso(now - offsetDays * day + 3600 * 1000),
 });
 
 export const dataMapRecentSessions: SessionItem[] = [

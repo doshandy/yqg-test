@@ -455,18 +455,19 @@ export const handlers: HttpHandler[] = [
   http.get('/api/agentic/agent/sessions', () => ok(mockSessionList())),
   http.post('/api/agentic/agent/sessions', async ({ request }) => {
     const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
-    // 返回结构对齐真实后端：body.id 是会话 ID，页面用 body.id 读取
-    const nowIso = new Date().toISOString();
+    // 真实后端创建会话时 title/summary 一律返 null，由首条对话后异步生成。
+    const nowMs = Date.now();
+    const iso = new Date(nowMs).toISOString().replace(/Z$/, '').slice(0, -1) + '000';
     return ok({
-      id: `sess_${Date.now().toString(16)}`,
+      id: `sess_${nowMs.toString(16)}`,
       title: null,
       taskScriptKind: null,
       status: 'ACTIVE',
       summary: null,
       taskCode: body?.taskCode ?? null,
       projectId: 1,
-      createdAt: nowIso,
-      lastActiveAt: nowIso,
+      createdAt: iso,
+      lastActiveAt: iso,
       agentType: body?.agentType ?? 'TEXT2SQL',
     });
   }),

@@ -125,14 +125,19 @@ export const FOLLOW_UP_SUGGESTION = 'FOLLOW_UP_SUGGESTION';
 
 // ---------- 侧边栏数据结构 ----------
 
+/**
+ * 结构对齐真实后端：大部分字段允许 null（新创建的会话 title/summary/taskCode
+ * 都是 null，第一条对话发送后后端才会异步生成 title）。
+ */
 export interface SessionItem {
   id: string;
-  title: string;
+  title: string | null;
+  taskScriptKind?: string | null;
   agentType: string;
   status: string;
-  summary?: string;
-  taskCode?: string;
-  projectId?: string;
+  summary?: string | null;
+  taskCode?: string | null;
+  projectId?: number | string | null;
   createdAt: string;
   lastActiveAt: string;
 }

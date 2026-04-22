@@ -41,7 +41,7 @@
               >
                 <div class="copilot-sidebar__item-content">
                   <MessageOutlined class="copilot-sidebar__item-icon" />
-                  <span class="copilot-sidebar__item-title">{{ item.title }}</span>
+                  <span class="copilot-sidebar__item-title">{{ item.title || '新对话' }}</span>
                 </div>
                 <Dropdown placement="bottomRight" :trigger="['click']">
                   <div class="copilot-sidebar__item-more" @click.stop>
@@ -85,7 +85,7 @@
               >
                 <div class="copilot-sidebar__item-content">
                   <MessageOutlined class="copilot-sidebar__item-icon" />
-                  <span class="copilot-sidebar__item-title">{{ item.title }}</span>
+                  <span class="copilot-sidebar__item-title">{{ item.title || '新对话' }}</span>
                 </div>
                 <Dropdown placement="bottomRight" :trigger="['click']">
                   <div class="copilot-sidebar__item-more" @click.stop>
