@@ -455,9 +455,18 @@ export const handlers: HttpHandler[] = [
   http.get('/api/agentic/agent/sessions', () => ok(mockSessionList())),
   http.post('/api/agentic/agent/sessions', async ({ request }) => {
     const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+    // 返回结构对齐真实后端：body.id 是会话 ID，页面用 body.id 读取
+    const nowIso = new Date().toISOString();
     return ok({
-      sessionId: `sess_${Date.now()}`,
-      taskCode: body?.taskCode ?? '',
+      id: `sess_${Date.now().toString(16)}`,
+      title: null,
+      taskScriptKind: null,
+      status: 'ACTIVE',
+      summary: null,
+      taskCode: body?.taskCode ?? null,
+      projectId: 1,
+      createdAt: nowIso,
+      lastActiveAt: nowIso,
       agentType: body?.agentType ?? 'TEXT2SQL',
     });
   }),
