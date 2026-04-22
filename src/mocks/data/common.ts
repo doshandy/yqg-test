@@ -30,5 +30,5 @@ export const globalNotice = {
   level: 'info',
   title: '欢迎使用 DataPlatform 单机体验版',
   content:
-    '本项目基于 cn-data-pilot / cn-data-lumina 的核心 UI 复刻，所有接口请求均由 MSW 拦截并返回 mock 数据，完全单机运行。',
+    '本项目所有接口请求均由 MSW 拦截并返回 mock 数据，完全单机运行。',
 };

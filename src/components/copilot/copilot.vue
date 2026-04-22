@@ -1,11 +1,4 @@
-<!--
- * @Author: shengzhitong shengzhitong@fintopia.tech
- * @Date: 2026-03-04 11:43:26
- * @LastEditors: shengzhitong shengzhitong@fintopia.tech
- * @LastEditTime: 2026-03-30 16:49:44
- * @FilePath: /cn-data-pilot/src/components/copilot/copilot.vue
- * @Description: DataPilot Copilot 智能助手界面
--->
+<!-- Copilot 智能助手界面 -->
 <template>
   <div class="copilot">
     <div v-if="copilotLoading" class="copilot-loading-overlay">

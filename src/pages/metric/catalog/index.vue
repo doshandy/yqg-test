@@ -1,7 +1,6 @@
 <!--
   @file Metric Catalog index.vue
-  @description 指标目录（cn-data-lumina /metric/catalog 精简版）
-  功能：关键字搜索 + 状态筛选 + 分页列表 + 标签渲染。
+  @description 指标目录：关键字搜索 + 状态筛选 + 分页列表 + 标签渲染。
   所有接口由 MSW mock。
 -->
 

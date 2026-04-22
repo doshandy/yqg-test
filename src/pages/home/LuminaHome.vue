@@ -1,8 +1,7 @@
 <!--
   @file LuminaHome.vue
-  @description DataLumina 风格首页（复刻自 cn-data-lumina/src/pages/home/index.vue）
-  保留：粉蓝霓虹科技感背景、活力动效 SVG Logo、打字机标语、三张功能卡片。
-  单机版：去掉 Agent 能力校验（原版会请求 `/explore/space` 接口）。
+  @description DataLumina 风格首页。
+  特性：粉蓝霓虹科技感背景、活力动效 SVG Logo、打字机标语、三张功能卡片。
 -->
 
 <template>

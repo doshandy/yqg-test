@@ -1,6 +1,5 @@
 /**
  * 发布订阅：通知 sql-query 刷新任务树并打开/切换对应任务
- * 复刻自 cn-data-pilot/pages/data-develop/sql/common/sql-query-event.ts
  */
 type Listener = (payload: { taskId: string | number }) => void;
 

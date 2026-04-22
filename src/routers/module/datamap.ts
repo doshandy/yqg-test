@@ -1,5 +1,5 @@
 /**
- * 数据地图路由（来自 cn-data-pilot 的 data-map 模块精简版）
+ * 数据地图路由
  */
 
 import type { RouteRecordRaw } from 'vue-router';

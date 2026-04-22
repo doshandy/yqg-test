@@ -1,10 +1,9 @@
 <!--
   SQL 查询模块（UI 骨架）
-  复刻自 cn-data-lumina/src/pages/explore/sql/index.vue
 
   布局：
     [40px 图标栏] [可展开左面板] [中间 Tab 编辑器] [挤压式抽屉 ×2] [40px 右图标栏]
-  与原项目一致：抽屉采用挤压式，不覆盖主编辑区。
+  抽屉采用挤压式，不覆盖主编辑区。
 -->
 <template>
   <div class="sql">

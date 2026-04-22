@@ -1,5 +1,5 @@
 /**
- * 数据开发（来自 cn-data-pilot 的 data-develop 模块精简 + mock 版）
+ * 数据开发模块路由（mock 版）
  */
 
 import type { RouteRecordRaw } from 'vue-router';

@@ -1,5 +1,5 @@
 /**
- * 指标中心路由（来自 cn-data-lumina 的 metric 模块精简版）
+ * 指标中心路由
  */
 
 import type { RouteRecordRaw } from 'vue-router';

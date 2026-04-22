@@ -1,7 +1,6 @@
 <!--
   @file ComingSoon.vue
   @description 占位页：路由 meta.subtitle 描述本模块未来功能。
-  复刻自 cn-data-pilot / cn-data-lumina 的 coming-soon 组件。
 -->
 
 <template>

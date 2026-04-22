@@ -1,11 +1,4 @@
-<!--
- * @Author: shengzhitong shengzhitong@fintopia.tech
- * @Date: 2026-03-04 11:43:26
- * @LastEditors: shengzhitong shengzhitong@fintopia.tech
- * @LastEditTime: 2026-04-20 14:09:33
- * @FilePath: /cn-data-pilot/src/components/copilot/copilot.vue
- * @Description: DataPilot Copilot 智能助手界面
--->
+<!-- 数据地图 Agent：对话式数据探索主页 -->
 <template>
   <div class="data-map-layout">
     <!-- 左侧侧边栏 -->

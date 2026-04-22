@@ -1,7 +1,7 @@
 /**
  * sql-sider 目录树 mock 数据。
  *
- * 原版 cn-data-pilot 返回结构：
+ * 原版返回结构：
  *   - /api/sql/directory-list：分页返回「某 parentId 下的直接子节点」，每个元素含
  *     { task?, taskDirectory, children? } 组合。
  *   - /api/sql/search-directory-list：一次性返回所有命中节点，嵌套完整树（用于搜索/筛选态）。

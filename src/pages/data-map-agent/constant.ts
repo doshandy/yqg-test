@@ -1,6 +1,5 @@
 /**
- * data-map-agent 模块：与原版 /data-map 独立的类型与常量定义。
- * 复刻自 cn-data-pilot/src/pages/data-map/constant.ts。
+ * data-map-agent 模块：与资产列表页 /data-map 独立的类型与常量定义。
  */
 
 // ---------- 会话消息数据结构 ----------

@@ -1,7 +1,6 @@
 <!--
   @file Workbench index.vue
-  @description 工作台：首页统计卡片 + 最近活动。
-  模拟 cn-data-pilot 中的入口概览页。数据全部来自 MSW mock。
+  @description 工作台：首页统计卡片 + 最近活动。数据全部来自 MSW mock。
 -->
 
 <template>

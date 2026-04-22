@@ -21,7 +21,6 @@ export const saveFileFromResponse = (response: {
 
 /**
  * 在树中查找某个节点的完整路径（用于面包屑/定位）
- * 从原版 cn-data-pilot common/utils.ts 原样复刻
  */
 export function findPath(
   tree: any[],

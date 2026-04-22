@@ -1,6 +1,5 @@
 /**
- * SQL 查询模块 mock 数据
- * 参考 cn-data-lumina 的 explore/sql 模块做 UI 骨架复刻。
+ * SQL 查询模块 mock 数据。
  */
 
 export interface DbTable {

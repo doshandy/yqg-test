@@ -1,6 +1,5 @@
 /**
  * 全局通知 store
- * 复刻自 cn-data-pilot / cn-data-lumina 的 global-notice store。
  */
 
 import { defineStore } from 'pinia';

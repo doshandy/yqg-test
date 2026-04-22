@@ -1,6 +1,5 @@
 <!--
   标签管理模块（UI 骨架）
-  复刻自 cn-data-lumina/src/pages/tag/index.vue
 
   布局：左侧菜单 + 右侧可编辑 Tabs（带刷新/关闭其他/关闭所有按钮）
 -->

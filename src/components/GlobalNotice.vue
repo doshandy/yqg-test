@@ -1,7 +1,6 @@
 <!--
   @file GlobalNotice.vue
   @description 全局通知条：位于 Layout 顶部，受 useGlobalNoticeStore 控制。
-  复刻自 cn-data-pilot / cn-data-lumina 的 global-notice 组件。
 -->
 
 <template>

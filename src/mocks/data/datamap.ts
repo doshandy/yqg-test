@@ -1,6 +1,5 @@
 /**
- * 数据地图（Data Map）mock 数据
- * 模拟 cn-data-pilot 中 /data-map 的数据资产目录。
+ * 数据地图（Data Map）mock 数据：数据资产目录。
  */
 
 export interface DataAssetItem {

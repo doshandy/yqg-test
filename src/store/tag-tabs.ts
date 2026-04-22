@@ -1,6 +1,5 @@
 /**
  * 标签管理 - Tab 页签 store
- * 复刻自 cn-data-lumina/src/store/tag-tabs 的精简版。
  */
 
 import { defineStore } from 'pinia';

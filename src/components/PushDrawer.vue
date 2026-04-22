@@ -1,6 +1,5 @@
 <!--
   挤压式侧边抽屉（push drawer）
-  复刻自 cn-data-pilot/src/pages/data-develop/sql/components/common/push-drawer.vue
   核心机制：自身是 flex 布局的子项，宽度 0 -> width 过渡，打开时挤压兄弟节点而非覆盖。
 -->
 <template>

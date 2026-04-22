@@ -1,6 +1,5 @@
 /**
- * 指标目录（Metric Catalog）mock 数据
- * 模拟 cn-data-lumina 中 /metric/catalog 的指标列表。
+ * 指标目录（Metric Catalog）mock 数据。
  */
 
 export interface MetricItem {

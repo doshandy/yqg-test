@@ -1,8 +1,7 @@
 <!--
   @file PilotHome.vue
-  @description DataPilot 风格科技感首页（复刻自 cn-data-pilot/src/pages/home/index.vue）
-  保留：Canvas 粒子背景、Logo 光环动画、打字机效果、鼠标跟随光效、特性卡片。
-  单机版：去掉全局通知自动触发、不再锁定 body 滚动，避免影响其他页面。
+  @description DataPilot 风格科技感首页。
+  特性：Canvas 粒子背景、Logo 光环动画、打字机效果、鼠标跟随光效、特性卡片。
 -->
 
 <template>
