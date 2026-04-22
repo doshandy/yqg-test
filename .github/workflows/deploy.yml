@@ -1,0 +1,64 @@
+name: Deploy to GitHub Pages
+
+# 每次 push 到 master 时触发；也支持在 Actions 页面手动触发。
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# Pages 部署需要的权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同时只跑一个部署，新的 push 会取消上一个尚未完成的
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.14.1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        env:
+          # Vite 以 PUBLIC_BASE 作为部署子路径；仓库名变更时只改这一处
+          PUBLIC_BASE: /yqg-test/
+        run: pnpm build
+
+      - name: Copy index.html to 404.html (SPA fallback)
+        # GitHub Pages 对未知深链接 fallback 到 404.html，让前端路由接管
+        run: cp dist/index.html dist/404.html
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
