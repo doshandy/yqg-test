@@ -88,7 +88,7 @@ const onOk = () => {
     message.warning('请填写新表名');
     return;
   }
-  message.success('已生成字段模板，请在下一步编辑（演示）');
+  message.success('已生成字段模板，请在下一步编辑');
   emit('created');
   emit('update:open', false);
 };

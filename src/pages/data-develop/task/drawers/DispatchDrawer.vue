@@ -145,7 +145,7 @@ watch(
 );
 
 const onSave = () => {
-  message.success('调度配置已保存（演示）');
+  message.success('调度配置已保存');
   emit('update:open', false);
 };
 </script>

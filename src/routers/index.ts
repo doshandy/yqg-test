@@ -13,6 +13,9 @@ import home from './module/home';
 import dashboard from './module/dashboard';
 import metric from './module/metric';
 import datamap from './module/datamap';
+import dqc from './module/dqc';
+import alert from './module/alert';
+import foundation from './module/foundation';
 import dataMapAgent from './module/data-map-agent';
 import dataDevelop from './module/data-develop';
 import tag from './module/tag';
@@ -21,6 +24,9 @@ const layoutChildren: RouteRecordRaw[] = [
   ...dashboard,
   ...metric,
   ...datamap,
+  ...dqc,
+  ...alert,
+  ...foundation,
   ...dataMapAgent,
   ...dataDevelop,
   ...tag,

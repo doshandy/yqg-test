@@ -64,7 +64,7 @@ const onOk = () => {
     message.warning('请填写变更说明');
     return;
   }
-  message.success('已提交到生产（演示）');
+  message.success('已提交到生产');
   emit('update:open', false);
 };
 </script>

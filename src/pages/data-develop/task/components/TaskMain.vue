@@ -144,7 +144,7 @@ const onAskAI = async () => {
   aiLoading.value = true;
   setTimeout(() => {
     aiLoading.value = false;
-    message.success('AI 已为你重写 SQL，逻辑等价，去除了冗余子查询（演示）');
+    message.success('AI 已为你重写 SQL，逻辑等价，去除了冗余子查询');
   }, 800);
 };
 

@@ -13,7 +13,7 @@
       <p class="coming-soon__subtitle">{{ subtitle }}</p>
       <a-tag color="processing" class="coming-soon__tag">Coming Soon</a-tag>
       <div class="coming-soon__hint">
-        该模块在原项目中包含重度依赖（Monaco / Notebook / DAG 等），单机 Demo 先不展开实现。
+        该模块涉及较重的编辑器或图形能力，当前保留统一入口。
       </div>
     </div>
   </div>

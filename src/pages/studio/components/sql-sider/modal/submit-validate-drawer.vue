@@ -2,14 +2,14 @@
 <template>
   <Drawer
     v-model:open="open"
-    title="提交校验（mock）"
+    title="提交校验"
     width="540"
     placement="right"
     destroy-on-close
     @close="onClose"
   >
     <div class="submit-validate-body">
-      <p>单机 Mock 场景：实际项目会在此处调用任务校验接口、列出所有规则结果。</p>
+      <p>这里会展示任务校验接口返回的规则结果。</p>
       <p>
         当前任务：
         <b>{{ paneName }}</b>

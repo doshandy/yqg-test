@@ -91,7 +91,7 @@ const onCreateEntry = () => {
 const onSwitchEnv = (v: 'DEV' | 'PROD') => { currentEnv.value = v; };
 
 const onCreated = () => {
-  message.info('建表任务已发起，可在列表中查看（演示）');
+  message.info('建表任务已发起，可在列表中查看');
 };
 </script>
 

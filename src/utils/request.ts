@@ -20,6 +20,13 @@ function buildUrl(url: string, params?: Record<string, unknown> | object) {
   const search = new URLSearchParams();
   Object.entries(params as Record<string, unknown>).forEach(([key, value]) => {
     if (value === undefined || value === null || value === '') return;
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        if (item === undefined || item === null || item === '') return;
+        search.append(key, String(item));
+      });
+      return;
+    }
     search.append(key, String(value));
   });
   const qs = search.toString();

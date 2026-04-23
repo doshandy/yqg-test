@@ -1,6 +1,6 @@
 <!--
   @file Data Map index.vue
-  @description 数据地图：按分层/关键字搜索数据表资产。所有接口由 MSW mock。
+  @description 数据地图：按分层/关键字搜索数据表资产。
 -->
 
 <template>

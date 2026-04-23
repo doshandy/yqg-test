@@ -6,7 +6,7 @@
     @update:open="emit('update:open', $event)"
   >
     <a-alert
-      message="历史提交记录，支持对比与回滚（演示版本，仅展示交互）。"
+      message="历史提交记录，支持对比与回滚。"
       type="info"
       show-icon
       style="margin-bottom: 12px"
@@ -93,8 +93,8 @@ watch(
 );
 
 const onDetail = (r: VersionItem) => { current.value = r; detailOpen.value = true; };
-const onCompare = (r: VersionItem) => message.info(`对比版本 ${r.version}（演示）`);
-const onRollback = (r: VersionItem) => message.success(`已回滚到 ${r.version}（演示）`);
+const onCompare = (r: VersionItem) => message.info(`对比版本 ${r.version}`);
+const onRollback = (r: VersionItem) => message.success(`已回滚到 ${r.version}`);
 </script>
 
 <style scoped>

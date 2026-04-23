@@ -13,6 +13,20 @@ import {
   projectOptions,
   globalNotice,
 } from './data/common';
+import {
+  getAlertOverview,
+  getAlertEnums,
+  queryAlerts,
+  updateAlertStatus,
+  batchUpdateAlerts,
+  getAlertDetail,
+  getAlertLogs,
+  queryPolicies,
+  savePolicy,
+  deletePolicy,
+  togglePolicy,
+  setDefaultPolicy,
+} from './data/alert';
 import { metricList } from './data/metric';
 import { assetList } from './data/datamap';
 import { homeStats, homeRecentActivity } from './data/home';
@@ -49,13 +63,126 @@ import {
 import {
   buildTagMenu,
   tagAreaOptions,
-  metricsMockList,
-  rulesMockList,
-  groupsMockList,
-  queryStatMockList,
-  systemAuthMockList,
-  categoryMockList,
+  queryMetrics,
+  saveMetric,
+  deleteMetric,
+  batchDisableMetrics,
+  toggleMetricStatus,
+  getMetricEnumOptions,
+  checkMetricIsNewTable,
+  addMetricDepTable,
+  getMetricProjects,
+  getMetricWorkflows,
+  queryRules,
+  saveRule,
+  deleteRule,
+  toggleRuleStatus,
+  executeSqlRule,
+  queryGroups,
+  saveGroup,
+  deleteGroup,
+  batchEditGroups,
+  exportGroup,
+  countGroup,
+  querySqlGroups,
+  saveSqlGroup,
+  deleteSqlGroup,
+  changeSqlGroupStatus,
+  executeSqlGroup,
+  sampleSqlGroup,
+  transferSqlGroupOwner,
+  exportSqlGroup,
+  queryTimings,
+  saveTiming,
+  deleteTiming,
+  runTiming,
+  toggleTimingStatus,
+  getTimingTaskDetail,
+  querySystemAuth,
+  saveSystemAuth,
+  deleteSystemAuth,
+  querySystemApps,
+  saveSystemApp,
+  deleteSystemApp,
+  queryContentAuth,
+  saveContentAuth,
+  deleteContentAuth,
+  getCategoryTree,
+  saveCategory,
+  deleteCategory,
+  queryWhiteList,
+  saveWhiteList,
+  deleteWhiteList,
+  getWhiteListUsage,
+  queryUserPictures,
+  saveUserPicture,
+  deleteUserPicture,
+  getUserSearchOptions,
+  searchUsers,
+  exportUsers,
+  queryTestData,
+  saveTestData,
+  deleteTestData,
+  getStatMeta,
+  queryStat,
+  getBloodline,
+  getBloodlineDetail,
+  exportBloodline,
+  getOrganizations,
+  getTagEnums,
+  getTagOpsDbList,
+  getTagOpsTableList,
+  getTagOpsOverview,
+  getTagOpsSection,
+  getTagOpsExecRecords,
+  exportTagOps,
+  generateTestData,
 } from './data/tag';
+import {
+  getDqcSummary,
+  getDqcEnums,
+  queryDqcTemplates,
+  saveDqcTemplate,
+  deleteDqcTemplate,
+  getDqcRuleConfigTree,
+  queryDqcRuleTableSuggestions,
+  queryDqcRuleConfigs,
+  getDqcRuleConfigDetail,
+  getDqcRuleConfigTableInfo,
+  getDqcRuleFieldOptions,
+  getDqcRuleTemplateCatalog,
+  getDqcRuleTemplateTree,
+  getDqcRuleTemplateNames,
+  generateDqcRuleCards,
+  getDqcAiRecommendedRules,
+  parseDqcSqlFields,
+  getDqcMonitorEditor,
+  saveDqcMonitorEditor,
+  deleteDqcMonitorEditor,
+  runDqcMonitorTest,
+  getDqcPreviewTimes,
+  getDqcProjectWorkflows,
+  saveDqcRule,
+  deleteDqcRule,
+  toggleDqcRule,
+  queryDqcRuns,
+  getDqcRunDetail,
+  rerunDqcRecord,
+  queryDqcDiffs,
+  getDqcDiffDetail,
+  getDqcDiffReport,
+  saveDqcDiff,
+  deleteDqcDiff,
+  runDqcDiff,
+  queryDqcTests,
+  getDqcTestInstances,
+  getDqcTestDetail,
+  getDqcTestReport,
+  saveDqcTestFeedback,
+  saveDqcTest,
+  deleteDqcTest,
+  runDqcTest,
+} from './data/dqc';
 import {
   buildTableTree as buildStudioTableTree,
   buildTaskTree as buildStudioTaskTree,
@@ -71,6 +198,21 @@ import {
   buildOwnerOptions as buildOpsOwnerOptions,
   buildLogTabs,
 } from './data/ops';
+import {
+  getScheduleSummary,
+  getScheduleEnums,
+  queryScheduleTasks,
+  checkScheduleNeedDate,
+  runScheduleTask,
+  getScheduleLogs,
+  getScheduleTaskDetail,
+  queryScheduleInstances,
+  rerunScheduleInstance,
+  stopScheduleInstance,
+  forceSuccessInstance,
+  getDependencyView,
+  getDependencyDiagnosis,
+} from './data/schedule';
 import {
   getDirectoryList as getSiderDirectoryList,
   searchDirectoryList as searchSiderDirectoryList,
@@ -125,6 +267,364 @@ export const handlers: HttpHandler[] = [
   http.get('/api/common/country-options', () => ok(countryOptions)),
   http.get('/api/common/project-options', () => ok(projectOptions)),
   http.get('/api/common/global-notice', () => ok(globalNotice)),
+
+  http.get('/api/schedule/summary', () => ok(getScheduleSummary())),
+  http.get('/api/schedule/enums', () => ok(getScheduleEnums())),
+  http.get('/api/schedule/tasks', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(queryScheduleTasks({
+      taskName: url.searchParams.get('taskName') ?? undefined,
+      taskType: url.searchParams.get('taskType') ?? undefined,
+      taskStatus: url.searchParams.get('taskStatus') ?? undefined,
+      owner: url.searchParams.get('owner') ?? undefined,
+      scheduleType: url.searchParams.get('scheduleType') ?? undefined,
+      lastRunStatus: url.searchParams.get('lastRunStatus') ?? undefined,
+      myResponsibility: url.searchParams.get('myResponsibility') === 'true' || url.searchParams.get('onlyMyTasks') === 'true',
+      pageNo: Number(url.searchParams.get('pageNo') ?? url.searchParams.get('pageNum') ?? 1),
+      pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+      releaseDate: url.searchParams.get('releaseDateStart')
+        ? {
+            startTime: url.searchParams.get('releaseDateStart') ?? undefined,
+            endTime: url.searchParams.get('releaseDateEnd') ?? undefined,
+          }
+        : undefined,
+      lastScheduleBatch: url.searchParams.get('lastScheduleBatchStart')
+        ? {
+            startTime: url.searchParams.get('lastScheduleBatchStart') ?? undefined,
+            endTime: url.searchParams.get('lastScheduleBatchEnd') ?? undefined,
+          }
+        : undefined,
+    }));
+  }),
+  http.get('/api/schedule/tasks/need-date', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(checkScheduleNeedDate(url.searchParams.get('taskId') ?? ''));
+  }),
+  http.get('/api/schedule/tasks/logs', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getScheduleLogs({
+      processInstanceId: url.searchParams.get('processInstanceId') ?? undefined,
+      skipLineNum: Number(url.searchParams.get('skipLineNum') ?? 0),
+    }));
+  }),
+  http.get('/api/schedule/tasks/detail', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getScheduleTaskDetail(url.searchParams.get('taskId') ?? ''));
+  }),
+  http.post('/api/schedule/tasks/run', async ({ request }) => {
+    const body = (await request.json()) as { taskId: string; scheduleTime?: string };
+    return ok(runScheduleTask(body));
+  }),
+  http.get('/api/schedule/instances', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(queryScheduleInstances({
+      taskName: url.searchParams.get('taskName') ?? undefined,
+      taskType: url.searchParams.get('taskType') ?? undefined,
+      runStatus: url.searchParams.get('runStatus') ?? undefined,
+      scheduleType: url.searchParams.get('scheduleType') ?? undefined,
+      scheduleExecuteType: url.searchParams.get('scheduleExecuteType') ?? undefined,
+      scheduleUser: url.searchParams.get('scheduleUser') ?? undefined,
+      pageNo: Number(url.searchParams.get('pageNo') ?? url.searchParams.get('pageNum') ?? 1),
+      pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+      scheduleBatch: url.searchParams.get('scheduleBatchStart')
+        ? {
+            startTime: url.searchParams.get('scheduleBatchStart') ?? undefined,
+            endTime: url.searchParams.get('scheduleBatchEnd') ?? undefined,
+          }
+        : undefined,
+    }));
+  }),
+  http.get('/api/schedule/instances/logs', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getScheduleLogs({
+      processInstanceId: url.searchParams.get('processInstanceId') ?? undefined,
+      skipLineNum: Number(url.searchParams.get('skipLineNum') ?? 0),
+    }));
+  }),
+  http.post('/api/schedule/instances/rerun', async ({ request }) => {
+    const body = (await request.json()) as { taskInstanceId: string };
+    return ok(rerunScheduleInstance(body));
+  }),
+  http.post('/api/schedule/instances/stop', async ({ request }) => {
+    const body = (await request.json()) as { taskInstanceId: string };
+    return ok(stopScheduleInstance(body));
+  }),
+  http.post('/api/schedule/instances/force-success', async ({ request }) => {
+    const body = (await request.json()) as { taskInstanceId: string };
+    return ok(forceSuccessInstance(body));
+  }),
+  http.get('/api/schedule/dependency/view', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDependencyView(url.searchParams.get('taskId') ?? ''));
+  }),
+  http.get('/api/schedule/dependency/diagnosis', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDependencyDiagnosis(url.searchParams.get('taskId') ?? ''));
+  }),
+
+  http.get('/api/alert/overview', () => ok(getAlertOverview())),
+  http.get('/api/alert/enums', () => ok(getAlertEnums())),
+  http.get('/api/alert/events', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(queryAlerts({
+      keyword: url.searchParams.get('keyword') ?? undefined,
+      eventId: url.searchParams.get('eventId') ?? undefined,
+      resourceType: url.searchParams.get('resourceType') ?? undefined,
+      eventTypes: url.searchParams.getAll('eventTypes'),
+      statuses: url.searchParams.getAll('statuses'),
+      severities: url.searchParams.getAll('severities'),
+      owners: url.searchParams.getAll('owners'),
+      lastOperators: url.searchParams.getAll('lastOperators'),
+      isSelf: url.searchParams.get('isSelf') === 'true',
+      todayOnly: url.searchParams.get('todayOnly') === 'true',
+      status: url.searchParams.get('status') ?? undefined,
+      severity: url.searchParams.get('severity') ?? undefined,
+      pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+      pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+    }));
+  }),
+  http.get('/api/alert/events/detail', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getAlertDetail(url.searchParams.get('id') ?? ''));
+  }),
+  http.get('/api/alert/events/logs', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getAlertLogs(url.searchParams.get('id') ?? ''));
+  }),
+  http.post('/api/alert/events/update-status', async ({ request }) => {
+    const body = (await request.json()) as {
+      id: string;
+      action: 'acknowledge' | 'resolve' | 'falsePositive' | 'silence' | 'transfer';
+      owner?: string;
+      remark?: string;
+      reason?: string;
+      rootCause?: string;
+      silenceHours?: number;
+    };
+    return ok(updateAlertStatus(body.id, body.action, body));
+  }),
+  http.post('/api/alert/events/batch-update', async ({ request }) => {
+    const body = (await request.json()) as {
+      ids: string[];
+      action: 'acknowledge' | 'resolve' | 'falsePositive' | 'silence' | 'transfer';
+      owner?: string;
+      remark?: string;
+      reason?: string;
+      rootCause?: string;
+      silenceHours?: number;
+    };
+    return ok(batchUpdateAlerts(body.ids, body.action, body));
+  }),
+  http.get('/api/alert/policies', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(queryPolicies({
+      keyword: url.searchParams.get('keyword') ?? undefined,
+      createdBy: url.searchParams.get('createdBy') ?? undefined,
+      pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+      pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+    }));
+  }),
+  http.post('/api/alert/policies/save', async ({ request }) => ok(savePolicy((await request.json()) as Record<string, unknown>))),
+  http.post('/api/alert/policies/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    return ok(deletePolicy(body.id));
+  }),
+  http.post('/api/alert/policies/toggle', async ({ request }) => {
+    const body = (await request.json()) as { id: string; enabled: boolean };
+    return ok(togglePolicy(body.id, body.enabled));
+  }),
+  http.post('/api/alert/policies/set-default', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    return ok(setDefaultPolicy(body.id));
+  }),
+
+  http.get('/api/dqc/summary', () => ok(getDqcSummary())),
+  http.get('/api/dqc/enums', () => ok(getDqcEnums())),
+  http.get('/api/dqc/templates', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(queryDqcTemplates({
+      type: url.searchParams.get('type') ?? undefined,
+      scope: url.searchParams.get('scope') ?? undefined,
+      pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+      pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+    }));
+  }),
+  http.post('/api/dqc/templates/save', async ({ request }) => ok(saveDqcTemplate((await request.json()) as Record<string, unknown>))),
+  http.post('/api/dqc/templates/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    return ok(deleteDqcTemplate(body.id));
+  }),
+  http.get('/api/dqc/rule-configs/tree', () => ok(getDqcRuleConfigTree())),
+  http.get('/api/dqc/rule-configs/table-suggestions', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(queryDqcRuleTableSuggestions(url.searchParams.get('keyword') ?? undefined));
+  }),
+  http.get('/api/dqc/rule-configs', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(queryDqcRuleConfigs({
+      tableName: url.searchParams.get('tableName') ?? undefined,
+      ownerUser: url.searchParams.get('ownerUser') ?? undefined,
+      notHasRule: url.searchParams.get('notHasRule') === 'true',
+      isSelf: url.searchParams.get('isSelf') === 'true',
+      dbSourceType: url.searchParams.get('dbSourceType') ?? undefined,
+      dataSourceId: url.searchParams.get('dataSourceId') ?? undefined,
+      databaseName: url.searchParams.get('databaseName') ?? undefined,
+      pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+      pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+    }));
+  }),
+  http.get('/api/dqc/rule-configs/detail', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDqcRuleConfigDetail(url.searchParams.get('tableId') ?? ''));
+  }),
+  http.get('/api/dqc/rule-configs/table-info', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDqcRuleConfigTableInfo(url.searchParams.get('tableId') ?? ''));
+  }),
+  http.get('/api/dqc/rule-configs/fields', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDqcRuleFieldOptions(url.searchParams.get('tableId') ?? ''));
+  }),
+  http.get('/api/dqc/rule-configs/template-catalog', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDqcRuleTemplateCatalog(url.searchParams.get('tableId') ?? '', url.searchParams.get('scopeType') ?? undefined));
+  }),
+  http.get('/api/dqc/rule-configs/template-tree', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDqcRuleTemplateTree(url.searchParams.get('tableId') ?? '', url.searchParams.get('scopeType') ?? undefined));
+  }),
+  http.get('/api/dqc/rule-configs/template-names', () => ok(getDqcRuleTemplateNames())),
+  http.post('/api/dqc/rule-configs/generate-cards', async ({ request }) =>
+    ok(generateDqcRuleCards((await request.json()) as Record<string, unknown> as never))),
+  http.get('/api/dqc/rule-configs/ai-recommend', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDqcAiRecommendedRules(url.searchParams.get('tableId') ?? ''));
+  }),
+  http.post('/api/dqc/rule-configs/parse-sql', async ({ request }) => {
+    const body = (await request.json()) as { sql: string };
+    return ok(parseDqcSqlFields(body.sql));
+  }),
+  http.get('/api/dqc/rule-configs/monitor-editor', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDqcMonitorEditor(url.searchParams.get('groupId') ?? undefined, url.searchParams.get('tableId') ?? undefined));
+  }),
+  http.post('/api/dqc/rule-configs/monitor-editor/save', async ({ request }) =>
+    ok(saveDqcMonitorEditor((await request.json()) as Record<string, unknown> as never))),
+  http.post('/api/dqc/rule-configs/monitor-editor/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    return ok(deleteDqcMonitorEditor(body.id));
+  }),
+  http.post('/api/dqc/rule-configs/monitor-editor/run-test', async ({ request }) => {
+    const body = (await request.json()) as { groupId: string };
+    return ok(runDqcMonitorTest(body.groupId));
+  }),
+  http.get('/api/dqc/rule-configs/preview-times', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDqcPreviewTimes(Number(url.searchParams.get('hourInterval') ?? 1), Number(url.searchParams.get('minuteOffset') ?? 0)));
+  }),
+  http.get('/api/dqc/rule-configs/workflows', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDqcProjectWorkflows(url.searchParams.get('projectCode') ?? undefined));
+  }),
+  http.post('/api/dqc/rules/save', async ({ request }) => ok(saveDqcRule((await request.json()) as Record<string, unknown>))),
+  http.post('/api/dqc/rules/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    return ok(deleteDqcRule(body.id));
+  }),
+  http.post('/api/dqc/rules/toggle', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    return ok(toggleDqcRule(body.id));
+  }),
+  http.get('/api/dqc/runs', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(queryDqcRuns({
+      tableName: url.searchParams.get('tableName') ?? undefined,
+      ruleGroupName: url.searchParams.get('ruleGroupName') ?? undefined,
+      triggerType: url.searchParams.get('triggerType') ?? undefined,
+      runStatus: url.searchParams.get('runStatus') ?? undefined,
+      alarmStatus: url.searchParams.get('alarmStatus') ?? undefined,
+      isSelf: url.searchParams.get('isSelf') === 'true',
+      pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+      pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+    }));
+  }),
+  http.get('/api/dqc/runs/detail', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDqcRunDetail(url.searchParams.get('runRecordId') ?? ''));
+  }),
+  http.post('/api/dqc/runs/rerun', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    return ok(rerunDqcRecord(body.id));
+  }),
+  http.get('/api/dqc/diffs', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(queryDqcDiffs({
+      taskId: url.searchParams.get('taskId') ?? undefined,
+      taskName: url.searchParams.get('taskName') ?? undefined,
+      compareMode: url.searchParams.get('compareMode') ?? undefined,
+      sourceTableName: url.searchParams.get('sourceTableName') ?? undefined,
+      targetTableName: url.searchParams.get('targetTableName') ?? undefined,
+      taskStatus: url.searchParams.get('taskStatus') ?? undefined,
+      creator: url.searchParams.get('creator') ?? undefined,
+      isSelf: url.searchParams.get('isSelf') === 'true',
+      pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+      pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+    }));
+  }),
+  http.get('/api/dqc/diffs/detail', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDqcDiffDetail(url.searchParams.get('id') ?? ''));
+  }),
+  http.get('/api/dqc/diffs/report', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDqcDiffReport(url.searchParams.get('id') ?? ''));
+  }),
+  http.post('/api/dqc/diffs/save', async ({ request }) => ok(saveDqcDiff((await request.json()) as Record<string, unknown>))),
+  http.post('/api/dqc/diffs/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    return ok(deleteDqcDiff(body.id));
+  }),
+  http.post('/api/dqc/diffs/run', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    return ok(runDqcDiff(body.id));
+  }),
+  http.get('/api/dqc/tests', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(queryDqcTests({
+      taskName: url.searchParams.get('taskName') ?? undefined,
+      databaseName: url.searchParams.get('databaseName') ?? undefined,
+      tableName: url.searchParams.get('tableName') ?? undefined,
+      createUser: url.searchParams.get('createUser') ?? undefined,
+      isSelf: url.searchParams.get('isSelf') === 'true',
+      pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+      pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+    }));
+  }),
+  http.get('/api/dqc/tests/instances', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDqcTestInstances(url.searchParams.get('taskId') ?? ''));
+  }),
+  http.get('/api/dqc/tests/detail', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDqcTestDetail(url.searchParams.get('id') ?? ''));
+  }),
+  http.get('/api/dqc/tests/report', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getDqcTestReport(url.searchParams.get('instanceId') ?? ''));
+  }),
+  http.post('/api/dqc/tests/report/feedback', async ({ request }) => {
+    const body = (await request.json()) as { instanceId: string; feedbackStatus: 'EXPECT_MATCH' | 'EXPECT_NOT_MATCH'; feedbackText?: string };
+    return ok(saveDqcTestFeedback(body.instanceId, body));
+  }),
+  http.post('/api/dqc/tests/save', async ({ request }) => ok(saveDqcTest((await request.json()) as Record<string, unknown>))),
+  http.post('/api/dqc/tests/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    return ok(deleteDqcTest(body.id));
+  }),
+  http.post('/api/dqc/tests/run', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    return ok(runDqcTest(body.id));
+  }),
 
   http.get('/api/home/stats', () => ok(homeStats)),
   http.get('/api/home/recent-activity', () => ok(homeRecentActivity)),
@@ -233,38 +733,392 @@ export const handlers: HttpHandler[] = [
     return ok(buildSqlResult(body?.sql ?? ''));
   }),
 
-  http.get('/api/tag/menu', () => ok(buildTagMenu())),
+  http.get('/api/tag/menu', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(buildTagMenu(url.searchParams.get('area') ?? 'CN'));
+  }),
   http.get('/api/tag/areas', () => ok(tagAreaOptions)),
   http.get('/api/tag/metrics', ({ request }) => {
     const url = new URL(request.url);
-    const keyword = url.searchParams.get('keyword')?.trim() ?? '';
-    const pageNo = Number(url.searchParams.get('pageNo') ?? 1);
-    const pageSize = Number(url.searchParams.get('pageSize') ?? 10);
-    const list = metricsMockList.filter((m) =>
-      !keyword || m.name.includes(keyword) || m.code.includes(keyword),
+    return ok(
+      queryMetrics({
+        keyword: url.searchParams.get('keyword') ?? undefined,
+        category: url.searchParams.get('category') ?? undefined,
+        metricsCode: url.searchParams.get('metricsCode') ?? undefined,
+        metricsName: url.searchParams.get('metricsName') ?? undefined,
+        type: url.searchParams.get('type') ?? undefined,
+        metricsType: url.searchParams.get('metricsType') ?? undefined,
+        creator: url.searchParams.get('creator') ?? undefined,
+        metricsCustomType: url.searchParams.get('metricsCustomType') ?? undefined,
+        status: url.searchParams.get('status') ?? undefined,
+        parentId: url.searchParams.get('parentId') ?? undefined,
+        metricsTimeLiness: url.searchParams.get('metricsTimeLiness') ?? undefined,
+        ownTable: url.searchParams.get('ownTable') ?? undefined,
+        ownColumn: url.searchParams.get('ownColumn') ?? undefined,
+        pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+        pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+      }),
     );
-    return ok(paginate(list, pageNo, pageSize));
+  }),
+  http.post('/api/tag/metrics/save', async ({ request }) => ok(saveMetric((await request.json()) as Record<string, unknown>))),
+  http.post('/api/tag/metrics/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    deleteMetric(body.id);
+    return ok({ success: true });
+  }),
+  http.post('/api/tag/metrics/batch-disable', async ({ request }) => {
+    const body = (await request.json()) as { ids: string[] };
+    batchDisableMetrics(body.ids || []);
+    return ok({ success: true });
+  }),
+  http.post('/api/tag/metrics/toggle-status', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    toggleMetricStatus(body.id);
+    return ok({ success: true });
+  }),
+  http.get('/api/tag/metrics/enums', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(
+      getMetricEnumOptions(
+        url.searchParams.get('typeName') ?? '',
+        url.searchParams.get('dbName') ?? undefined,
+        url.searchParams.get('tableName') ?? undefined,
+      ),
+    );
+  }),
+  http.get('/api/tag/metrics/check-new-table', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(
+      checkMetricIsNewTable(
+        url.searchParams.get('dbName') ?? undefined,
+        url.searchParams.get('tableName') ?? undefined,
+      ),
+    );
+  }),
+  http.post('/api/tag/metrics/add-dep-table', async ({ request }) =>
+    ok(addMetricDepTable((await request.json()) as Record<string, unknown> as {
+      dolphinProjectId?: string;
+      dolphinProcessId?: string;
+      dbName?: string;
+      tableName?: string;
+    }))),
+  http.get('/api/tag/white-list/projects', () => ok(getMetricProjects())),
+  http.get('/api/tag/white-list/workflows', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getMetricWorkflows(url.searchParams.get('projectId') ?? undefined));
   }),
   http.get('/api/tag/rules', ({ request }) => {
     const url = new URL(request.url);
-    const pageNo = Number(url.searchParams.get('pageNo') ?? 1);
-    const pageSize = Number(url.searchParams.get('pageSize') ?? 10);
-    return ok(paginate(rulesMockList, pageNo, pageSize));
+    return ok(
+      queryRules({
+        keyword: url.searchParams.get('keyword') ?? undefined,
+        metricsName: url.searchParams.get('metricsName') ?? undefined,
+        ruleCode: url.searchParams.get('ruleCode') ?? undefined,
+        ruleName: url.searchParams.get('ruleName') ?? undefined,
+        ruleTimeliness: url.searchParams.get('ruleTimeliness') ?? undefined,
+        status: url.searchParams.get('status') ?? undefined,
+        customType: url.searchParams.get('customType') ?? undefined,
+        parentId: url.searchParams.get('parentId') ?? undefined,
+        creatorName: url.searchParams.get('creatorName') ?? undefined,
+        pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+        pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+      }),
+    );
+  }),
+  http.post('/api/tag/rules/save', async ({ request }) => ok(saveRule((await request.json()) as Record<string, unknown>))),
+  http.post('/api/tag/rules/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    deleteRule(body.id);
+    return ok({ success: true });
+  }),
+  http.post('/api/tag/rules/toggle-status', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    toggleRuleStatus(body.id);
+    return ok({ success: true });
+  }),
+  http.post('/api/tag/rules/execute-sql', async ({ request }) => {
+    const body = (await request.json()) as { code: string };
+    return ok(executeSqlRule(body.code));
   }),
   http.get('/api/tag/groups', ({ request }) => {
     const url = new URL(request.url);
-    const pageNo = Number(url.searchParams.get('pageNo') ?? 1);
-    const pageSize = Number(url.searchParams.get('pageSize') ?? 10);
-    return ok(paginate(groupsMockList, pageNo, pageSize));
+    return ok(
+      queryGroups({
+        keyword: url.searchParams.get('keyword') ?? undefined,
+        groupCode: url.searchParams.get('groupCode') ?? undefined,
+        groupName: url.searchParams.get('groupName') ?? undefined,
+        parentId: url.searchParams.get('parentId') ?? undefined,
+        groupType: url.searchParams.get('groupType') ?? undefined,
+        creatorName: url.searchParams.get('creatorName') ?? undefined,
+        sourceType: url.searchParams.get('sourceType') ?? undefined,
+        pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+        pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+        sqlOnly: url.searchParams.get('sqlOnly') === '1',
+      }),
+    );
   }),
-  http.get('/api/tag/query-stat', ({ request }) => {
+  http.post('/api/tag/groups/save', async ({ request }) => ok(saveGroup((await request.json()) as Record<string, unknown>))),
+  http.post('/api/tag/groups/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    deleteGroup(body.id);
+    return ok({ success: true });
+  }),
+  http.post('/api/tag/groups/batch-edit', async ({ request }) => {
+    const body = (await request.json()) as { ids: string[] };
+    batchEditGroups(body.ids || []);
+    return ok({ success: true });
+  }),
+  http.post('/api/tag/groups/export', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    return ok(exportGroup(body.id));
+  }),
+  http.post('/api/tag/groups/count', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    return ok(countGroup(body.id));
+  }),
+  http.get('/api/tag/sql-groups', ({ request }) => {
     const url = new URL(request.url);
-    const pageNo = Number(url.searchParams.get('pageNo') ?? 1);
-    const pageSize = Number(url.searchParams.get('pageSize') ?? 10);
-    return ok(paginate(queryStatMockList, pageNo, pageSize));
+    return ok(
+      querySqlGroups({
+        keyword: url.searchParams.get('keyword') ?? undefined,
+        sqlGroupCode: url.searchParams.get('sqlGroupCode') ?? undefined,
+        name: url.searchParams.get('name') ?? undefined,
+        status: url.searchParams.get('status') ?? undefined,
+        application: url.searchParams.get('application') ?? undefined,
+        ownerName: url.searchParams.get('ownerName') ?? undefined,
+        creatorName: url.searchParams.get('creatorName') ?? undefined,
+        pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+        pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+      }),
+    );
   }),
-  http.get('/api/tag/system-auth', () => ok(systemAuthMockList)),
-  http.get('/api/tag/category', () => ok(categoryMockList)),
+  http.post('/api/tag/sql-groups/save', async ({ request }) => ok(saveSqlGroup((await request.json()) as Record<string, unknown>))),
+  http.post('/api/tag/sql-groups/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    deleteSqlGroup(body.id);
+    return ok({ success: true });
+  }),
+  http.post('/api/tag/sql-groups/change-status', async ({ request }) => {
+    const body = (await request.json()) as { id: string; action: 'startPush' | 'stopPush' };
+    changeSqlGroupStatus(body.id, body.action);
+    return ok({ success: true });
+  }),
+  http.post('/api/tag/sql-groups/execute', async ({ request }) => {
+    const body = (await request.json()) as { id: string; mode: 'EXECUTE' | 'PUSH' | 'ALL' };
+    return ok(executeSqlGroup(body.id, body.mode));
+  }),
+  http.post('/api/tag/sql-groups/sample', async ({ request }) => {
+    const body = (await request.json()) as { id: string; userIds: string[] };
+    return ok({ result: sampleSqlGroup(body.id, body.userIds || []) });
+  }),
+  http.post('/api/tag/sql-groups/transfer-owner', async ({ request }) => {
+    const body = (await request.json()) as { id: string; ownerName: string };
+    transferSqlGroupOwner(body.id, body.ownerName);
+    return ok({ success: true });
+  }),
+  http.post('/api/tag/sql-groups/export', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    return ok(exportSqlGroup(body.id));
+  }),
+  http.get('/api/tag/timings', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(
+      queryTimings({
+        keyword: url.searchParams.get('keyword') ?? undefined,
+        groupCode: url.searchParams.get('groupCode') ?? undefined,
+        metricsCode: url.searchParams.get('metricsCode') ?? undefined,
+        timing: url.searchParams.get('timing') ?? undefined,
+        status: url.searchParams.get('status') ?? undefined,
+        application: url.searchParams.get('application') ?? undefined,
+        isFullData: url.searchParams.get('isFullData') ?? undefined,
+        creatorName: url.searchParams.get('creatorName') ?? undefined,
+        targetType: url.searchParams.get('targetType') ?? undefined,
+        pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+        pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+      }),
+    );
+  }),
+  http.post('/api/tag/timings/save', async ({ request }) => ok(saveTiming((await request.json()) as Record<string, unknown>))),
+  http.post('/api/tag/timings/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    deleteTiming(body.id);
+    return ok({ success: true });
+  }),
+  http.post('/api/tag/timings/run', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    return ok(runTiming(body.id));
+  }),
+  http.post('/api/tag/timings/toggle-status', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    toggleTimingStatus(body.id);
+    return ok({ success: true });
+  }),
+  http.get('/api/tag/timings/task-detail', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getTimingTaskDetail(url.searchParams.get('id') ?? ''));
+  }),
+  http.get('/api/tag/system-auth', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(
+      querySystemAuth({
+        appName: url.searchParams.get('appName') ?? undefined,
+        pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+        pageSize: Number(url.searchParams.get('pageSize') ?? 20),
+      }),
+    );
+  }),
+  http.post('/api/tag/system-auth/save', async ({ request }) => ok(saveSystemAuth((await request.json()) as Record<string, unknown>))),
+  http.post('/api/tag/system-auth/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    deleteSystemAuth(body.id);
+    return ok({ success: true });
+  }),
+  http.get('/api/tag/system-apps', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(querySystemApps({
+      pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+      pageSize: Number(url.searchParams.get('pageSize') ?? 20),
+    }));
+  }),
+  http.post('/api/tag/system-apps/save', async ({ request }) => ok(saveSystemApp((await request.json()) as Record<string, unknown>))),
+  http.post('/api/tag/system-apps/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    deleteSystemApp(body.id);
+    return ok({ success: true });
+  }),
+  http.get('/api/tag/content-auth', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(
+      queryContentAuth({
+        chidoriName: url.searchParams.get('chidoriName') ?? undefined,
+        accessType: url.searchParams.get('accessType') ?? undefined,
+        type: url.searchParams.get('type') ?? undefined,
+        organizationId: url.searchParams.get('organizationId') ?? undefined,
+        pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+        pageSize: Number(url.searchParams.get('pageSize') ?? 20),
+      }),
+    );
+  }),
+  http.post('/api/tag/content-auth/save', async ({ request }) => ok(saveContentAuth((await request.json()) as Record<string, unknown>))),
+  http.post('/api/tag/content-auth/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    deleteContentAuth(body.id);
+    return ok({ success: true });
+  }),
+  http.get('/api/tag/category', () => ok(getCategoryTree())),
+  http.post('/api/tag/category/save', async ({ request }) => {
+    saveCategory((await request.json()) as Record<string, unknown>);
+    return ok({ success: true });
+  }),
+  http.post('/api/tag/category/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    deleteCategory(body.id);
+    return ok({ success: true });
+  }),
+  http.get('/api/tag/white-list', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(
+      queryWhiteList({
+        dbName: url.searchParams.get('dbName') ?? undefined,
+        tableName: url.searchParams.get('tableName') ?? undefined,
+        usedType: url.searchParams.get('usedType') ?? undefined,
+        pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+        pageSize: Number(url.searchParams.get('pageSize') ?? 20),
+      }),
+    );
+  }),
+  http.post('/api/tag/white-list/save', async ({ request }) => ok(saveWhiteList((await request.json()) as Record<string, unknown>))),
+  http.post('/api/tag/white-list/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    deleteWhiteList(body.id);
+    return ok({ success: true });
+  }),
+  http.get('/api/tag/white-list/check-usage', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getWhiteListUsage(url.searchParams.get('dbName') ?? '', url.searchParams.get('tableName') ?? ''));
+  }),
+  http.get('/api/tag/user-picture', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(queryUserPictures({
+      pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+      pageSize: Number(url.searchParams.get('pageSize') ?? 20),
+    }));
+  }),
+  http.post('/api/tag/user-picture/save', async ({ request }) => ok(saveUserPicture((await request.json()) as Record<string, unknown>))),
+  http.post('/api/tag/user-picture/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    deleteUserPicture(body.id);
+    return ok({ success: true });
+  }),
+  http.get('/api/tag/user-search/options', () => ok(getUserSearchOptions())),
+  http.post('/api/tag/user-search/query', async ({ request }) => ok(searchUsers((await request.json()) as any))),
+  http.post('/api/tag/user-search/export', async ({ request }) => ok(exportUsers((await request.json()) as any))),
+  http.get('/api/tag/test-data', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(
+      queryTestData({
+        ruleCode: url.searchParams.get('ruleCode') ?? undefined,
+        userId: url.searchParams.get('userId') ?? undefined,
+        pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+        pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+      }),
+    );
+  }),
+  http.post('/api/tag/test-data/save', async ({ request }) => ok(saveTestData((await request.json()) as Record<string, unknown>))),
+  http.post('/api/tag/test-data/delete', async ({ request }) => {
+    const body = (await request.json()) as { id: string };
+    deleteTestData(body.id);
+    return ok({ success: true });
+  }),
+  http.get('/api/tag/stat/meta', () => ok(getStatMeta())),
+  http.post('/api/tag/stat/query', async ({ request }) => ok(queryStat((await request.json()) as any))),
+  http.get('/api/tag/bloodline/query', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getBloodline({
+      code: url.searchParams.get('code') ?? undefined,
+      dep: Number(url.searchParams.get('dep') ?? 0),
+      type: url.searchParams.get('type') ?? undefined,
+    }));
+  }),
+  http.get('/api/tag/bloodline/detail', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getBloodlineDetail(url.searchParams.get('code') ?? ''));
+  }),
+  http.post('/api/tag/bloodline/export', async ({ request }) => {
+    const body = (await request.json()) as { code: string };
+    return ok(exportBloodline(body.code));
+  }),
+  http.get('/api/tag/organizations', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getOrganizations((url.searchParams.get('type') as 'RULE' | 'GROUP') || 'RULE'));
+  }),
+  http.get('/api/tag/enums', () => ok(getTagEnums())),
+  http.get('/api/tag/tag-ops/dbs', () => ok(getTagOpsDbList())),
+  http.get('/api/tag/tag-ops/tables', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getTagOpsTableList(url.searchParams.get('dbName') ?? ''));
+  }),
+  http.get('/api/tag/tag-ops/overview', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getTagOpsOverview({ tableNames: (url.searchParams.get('tableNames') ?? '').split(',').filter(Boolean) }));
+  }),
+  http.get('/api/tag/tag-ops/section/:section', ({ request, params }) => {
+    const url = new URL(request.url);
+    return ok(getTagOpsSection(params.section as any, {
+      pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+      pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+      keyword: url.searchParams.get('keyword') ?? undefined,
+    }));
+  }),
+  http.get('/api/tag/tag-ops/exec-records', ({ request }) => {
+    const url = new URL(request.url);
+    return ok(getTagOpsExecRecords({
+      pageNo: Number(url.searchParams.get('pageNo') ?? 1),
+      pageSize: Number(url.searchParams.get('pageSize') ?? 10),
+    }));
+  }),
+  http.post('/api/tag/tag-ops/export', async ({ request }) => ok(exportTagOps((await request.json()) as any))),
+  http.post('/api/tag/test-data/generate', async ({ request }) => ok(generateTestData((await request.json()) as any))),
 
   // ============== SQL Studio ==============
   http.get('/api/studio/table-tree', () => ok(buildStudioTableTree())),

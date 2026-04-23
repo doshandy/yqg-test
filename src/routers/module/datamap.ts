@@ -18,16 +18,10 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '资产详情', hiddenInMenu: true },
   },
   {
-    path: '/dqc',
-    name: 'Dqc',
-    component: () => import('@/pages/common/ComingSoon.vue'),
-    meta: { title: '数据质量', icon: 'SafetyCertificateOutlined', subtitle: '规则管理 + 调度执行' },
-  },
-  {
     path: '/schedule',
     name: 'Schedule',
-    component: () => import('@/pages/common/ComingSoon.vue'),
-    meta: { title: '任务调度', icon: 'ScheduleOutlined', subtitle: '依赖 DAG 编排与实例运维' },
+    component: () => import('@/pages/schedule/index.vue'),
+    meta: { title: '调度管理', icon: 'ScheduleOutlined', subtitle: '任务运维、实例运维与依赖诊断' },
   },
 ];
 

@@ -47,7 +47,7 @@ const onOk = () => {
     message.warning('请填写重建原因');
     return;
   }
-  message.success('重建请求已提交（演示）');
+  message.success('重建请求已提交');
   emit('update:open', false);
 };
 </script>

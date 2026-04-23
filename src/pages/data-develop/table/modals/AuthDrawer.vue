@@ -145,7 +145,7 @@ const onGrant = () => {
     expireAt: '永久',
   });
   grantOpen.value = false;
-  message.success('授权成功（演示）');
+  message.success('授权成功');
 };
 </script>
 

@@ -172,7 +172,7 @@ const onOk = () => {
     message.warning('请填写表名');
     return;
   }
-  message.success('建表请求已提交（演示）');
+  message.success('建表请求已提交');
   emit('created');
   emit('update:open', false);
 };

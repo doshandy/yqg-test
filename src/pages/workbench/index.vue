@@ -7,7 +7,7 @@
   <div class="workbench">
     <div class="workbench__header">
       <h2>工作台</h2>
-      <p>一眼看清平台最近的数据与活动。所有接口由 MSW mock，单机运行。</p>
+      <p>一眼看清平台最近的数据与活动，快速进入常用工作区。</p>
     </div>
 
     <a-row :gutter="16" class="workbench__stats">

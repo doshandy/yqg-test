@@ -44,7 +44,7 @@ const onOk = () => {
     message.warning('请粘贴 DDL 语句');
     return;
   }
-  message.success('DDL 解析成功，建表请求已提交（演示）');
+  message.success('DDL 解析成功，建表请求已提交');
   emit('created');
   emit('update:open', false);
 };

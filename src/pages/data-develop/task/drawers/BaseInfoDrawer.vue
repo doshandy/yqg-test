@@ -73,7 +73,7 @@ watch(
 );
 
 const onSave = () => {
-  message.success('保存成功（演示）');
+  message.success('保存成功');
   emit('update:open', false);
 };
 </script>

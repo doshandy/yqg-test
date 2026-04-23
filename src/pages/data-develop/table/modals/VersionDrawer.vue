@@ -112,7 +112,7 @@ const onView = (r: TableVersionItem) => { current.value = r; detailOpen.value = 
 const onCompare = (r: TableVersionItem) => { current.value = r; compareOpen.value = true; };
 const onRollback = async (r: TableVersionItem) => {
   await DataDevelopApi.rollbackTable({ tableId: props.tableId ?? '', versionId: r.versionId });
-  message.success(`已回滚到 ${r.version}（演示）`);
+  message.success(`已回滚到 ${r.version}`);
 };
 </script>
 

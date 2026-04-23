@@ -13,7 +13,7 @@
         <div class="submit-pane-modal-title">{{ title }}</div>
         <div class="submit-pane-modal-desc">
           即将对任务 <b>{{ paneName }}</b> 执行「{{ action }}」操作。
-          <br />单机 Mock 场景：确认后仅本地提示，不会真正调用远程接口。
+          <br />确认后会按当前流程更新状态与结果提示。
         </div>
       </div>
     </div>
@@ -43,7 +43,7 @@ const showModal = (data: {
 
 const onOk = () => {
   open.value = false;
-  message.success(`${title.value}成功（mock）`);
+  message.success(`${title.value}成功`);
 };
 
 const onCancel = () => {

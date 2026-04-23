@@ -210,7 +210,7 @@ const onCreateConfirm = () => {
   activeKey.value = key;
   createOpen.value = false;
   createForm.name = '';
-  message.success('任务已创建（演示）');
+  message.success('任务已创建');
 };
 
 const onRun = () => {

@@ -102,7 +102,7 @@
         </a-tab-pane>
         <a-tab-pane key="lineage" tab="血缘">
           <a-alert
-            message="血缘展示上下游表和依赖任务。此处为演示占位。"
+            message="血缘展示上下游表和依赖任务。"
             type="info"
             show-icon
             style="margin-bottom: 12px"
@@ -195,9 +195,9 @@ LIFECYCLE ${d.lifecycle};`;
 }
 
 const onMenuClick = ({ key }: { key: string }) => {
-  if (key === 'edit') message.info('编辑表结构（演示）');
+  if (key === 'edit') message.info('编辑表结构');
   if (key === 'recreate') emit('openRecreate');
-  if (key === 'delete') message.warning('删除表需走流程审批（演示）');
+  if (key === 'delete') message.warning('删除表需走流程审批');
 };
 
 watch(() => props.tableId, load, { immediate: true });
