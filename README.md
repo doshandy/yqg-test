@@ -239,9 +239,62 @@ Copilot 在项目里有 **两处挂载**，共享一套 SSE mock：
 ### fullBleed 路由
 需要整屏展示（无内边距）的页面要加到 `AppLayout.vue` 的 `fullBleedRoutes` 集合：`/studio` `/ops` `/data-map-agent` 等。
 
-## 新增一个接口的工作流
+## 开发流程
 
-1. 在 `src/mocks/data/<模块>.ts` 准备响应数据；
+### 1. 日常开发循环
+
+```bash
+git pull                # 拉最新代码
+pnpm dev                # 启动 dev server（带 MSW mock），默认 http://127.0.0.1:5173
+```
+
+保存后 Vite HMR 自动热更新，一般不用重启。
+
+### 2. 提交前自检
+
+```bash
+pnpm typecheck          # vue-tsc --noEmit，零错误才提交
+pnpm build              # 本地模拟生产构建，确保能过
+```
+
+### 3. 提交 + 推送
+
+```bash
+git status              # 看改了啥
+git diff                # 看具体改动
+git add <文件>          # 避免 git add . 误带 .env 等
+git commit -m "type: subject
+
+  body 说清 why"
+git push                # upstream 已设，直接 push 到 origin master
+```
+
+commit message 约定（参考仓库历史风格）：
+
+| type | 场景 |
+|---|---|
+| `feat` | 新增功能、页面、接口 |
+| `fix` | bug 修复 |
+| `chore` | 依赖 / 工具链 / 构建配置 |
+| `ci` | GitHub Actions 相关 |
+| `docs` | README、注释 |
+| `refactor` | 不改行为的重构 |
+
+### 4. 自动部署
+
+push 到 `master` 后**什么都不用做**：
+
+1. GitHub Actions 的 `Deploy to GitHub Pages` 工作流自动触发
+2. 2-3 分钟内产物发布到 https://doshandy.github.io/yqg-test/
+
+查看进度：https://github.com/doshandy/yqg-test/actions
+
+想手动触发一次部署（例如改了 Pages 配置）：Actions 页面 → 选 workflow → `Run workflow`。
+
+### 5. 新增功能的标准顺序
+
+**加一个新接口**：
+1. 在 `src/mocks/data/<模块>.ts` 准备响应数据
 2. 在 `src/mocks/handlers.ts` 挂 handler：
    ```ts
    http.get('/api/xxx/yyy', ({ request }) => ok(buildYourData()))
@@ -250,9 +303,34 @@ Copilot 在项目里有 **两处挂载**，共享一套 SSE mock：
    ```ts
    fetchXxx: (params) => request.get('/api/xxx/yyy', { params })
    ```
-4. 页面侧调用 + 解构 body 使用。
+4. 页面侧调用 + 解构 body 使用
+
+**加一个新路由页**：
+1. 新建页面组件 `src/pages/<name>/index.vue`
+2. 新建路由模块 `src/routers/module/<name>.ts`，并在 `src/routers/index.ts` 聚合进 `layoutChildren`
+3. 整屏页加入 `src/layouts/AppLayout.vue` 的 `fullBleedRoutes` 集合（去掉内边距）
+4. 在路由 `meta.icon` 指定图标名（`AppstoreOutlined` 等），需已注册到 `AppLayout.vue` 的 `iconMap` 才会显示
+
+**加一个 Copilot 剧本**：
+1. `src/mocks/data/copilot.ts` 新增 `buildXxxScript`，并在 dispatcher 里加触发关键字
+2. 新卡片在 `src/components/copilot/components/` 下新建组件
+3. 新 FRONTEND_ACTION 类型在 `src/components/copilot/manage/PageOperationManager.ts` 加常量，宿主页 `register` 消费
 
 新增 SSE 剧本参考 `src/mocks/data/copilot.ts` 的 `buildCodeGenScript` / `buildTableClarifyScript` 等。
+
+### 6. 不要做的事
+
+- `git push --force` 到 master
+- 跳过 pre-commit hook（目前没配，以后配了别 `--no-verify`）
+- 直接改 `dist/` 或 `public/mockServiceWorker.js`（前者是构建产物、后者是 MSW 生成的）
+- `git add .` / `git add -A` 范围太大，容易带进 `.env` 或临时产物——按文件加
+
+### 7. 分支策略
+
+当前是**单 master 直推**模式（仓库只用于 demo，无协作）。如果以后要多人协作：
+- 功能分支 `feat/xxx`、修复分支 `fix/xxx`
+- PR 合并到 master
+- Actions 对 PR 加一个 "build + typecheck" 校验 job，通过后才允许合并
 
 ## 刻意跳过的内容
 
@@ -267,17 +345,15 @@ Copilot 在项目里有 **两处挂载**，共享一套 SSE mock：
 
 ## 常见问题
 
-**Q: 刷新后 MSW 报 404？**
-A: 检查 `public/mockServiceWorker.js` 是否存在。如果没了就跑 `pnpm exec msw init public/ --save` 重新生成。
-
-**Q: dev server 启动但页面白屏？**
-A: 打开 DevTools Console；大概率是 Service Worker 首次注册后还没 fetch 到 mock，再刷新一次即可。
-
-**Q: 改了 mock 剧本，Copilot 怎么不生效？**
-A: 浏览器会缓存 Service Worker 脚本；DevTools → Application → Service Workers → "Update on reload" 勾上，或手动 unregister 再刷新。
-
-**Q: 线上 Pages 访问首页空白？**
-A: 首次部署后 Service Worker 首轮注册完才开始拦截请求，刷新一次即可；如果持续空白，看 DevTools Console 是否有 `/yqg-test/mockServiceWorker.js` 404 报错。
+| 现象 | 处理 |
+|---|---|
+| 刷新后 MSW 报 404 | 检查 `public/mockServiceWorker.js` 是否存在；没了就跑 `pnpm exec msw init public/ --save` 重新生成 |
+| dev server 启动但页面白屏 | 打开 DevTools Console；大概率是 Service Worker 首次注册后还没 fetch 到 mock，再刷新一次即可 |
+| 改了 mock 剧本，Copilot 不生效 | 浏览器缓存了 SW 脚本；DevTools → Application → Service Workers → "Update on reload" 勾上，或手动 unregister 再刷新 |
+| 线上 Pages 访问首页空白 | 首次部署后 SW 首轮注册完才开始拦截请求，刷新一次即可；若持续空白，看 Console 是否有 `/yqg-test/mockServiceWorker.js` 404 |
+| `pnpm install` peer warning | `syntax-parser` 老包遗留，忽略即可 |
+| `pnpm build` 报类型错 | `build` 不做类型检查，build 失败通常是真代码错；用 `pnpm typecheck` 单独跑看具体行号 |
+| 依赖更新后启动异常 | `rm -rf node_modules && pnpm install` |
 
 ## License
 
